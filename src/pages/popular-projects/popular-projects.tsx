@@ -5,6 +5,7 @@ import { GitProjectList } from './components/git-project-list/git-project-list';
 import { APIProjectType } from './popular-projects-types';
 
 import './popular-projects.scss';
+import { PER_PAGE } from './popular-projects-constants';
 
 export const PopularProjects = () => {
   const [projects, setProjects] = useState<APIProjectType[]>([]);
@@ -13,6 +14,7 @@ export const PopularProjects = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const pageRef = useRef<number>(1);
+  const lastPageRef = useRef<number>(1);
 
   const handleSetLastInView = useCallback((inView: boolean) => {
     setLastInView(inView);
@@ -28,7 +30,7 @@ export const PopularProjects = () => {
           q: 'language:typescript',
           sort: 'stars',
           page: pageNumber,
-          per_page: '50',
+          per_page: PER_PAGE,
         }
       }
     ).then(
