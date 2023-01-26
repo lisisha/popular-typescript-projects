@@ -1,26 +1,25 @@
-import { useEffect, useRef, useState } from 'react';
-
+import { useCallback, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import { ProgressBar } from 'react-loader-spinner';
 
-import { ProjectType } from './popular-projects-types';
-import { GitProject } from './components/git-project';
+import { GitProjectList } from './components/git-project-list/git-project-list';
+import { APIProjectType } from './popular-projects-types';
 
 import './popular-projects.scss';
 
 export const PopularProjects = () => {
-  const [projects, setProjects] = useState<ProjectType[]>([]);
+  const [projects, setProjects] = useState<APIProjectType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLastInView, setLastInView] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
   const pageRef = useRef<number>(1);
 
-  const handleSetLastInView = (inView: boolean) => {
+  const handleSetLastInView = useCallback((inView: boolean) => {
     setLastInView(inView);
-  }
+  }, [setLastInView]);
 
-  const getProjects = async (pageNumber: number) => {
+  const getProjects = useCallback(async (pageNumber: number) => {
     setIsLoading(true);
-    console.log(pageNumber);
 
     await axios.get(
       'https://api.github.com/search/repositories',
@@ -42,11 +41,11 @@ export const PopularProjects = () => {
         );
         setIsLoading(false);
       },
-      ({error}: any) => {
-        console.log(error);
+      (error: any) => {
+        setErrorMessage(error.message);
       }
     );
-  }
+  }, [projects]);
 
   useEffect(() => {
     getProjects(pageRef.current);
@@ -61,40 +60,12 @@ export const PopularProjects = () => {
 
   return (
     <div className='container'>
-      <ul
-        className='project-list'
-      >
-        <>
-          {
-            projects.map((project, index) => (
-              <GitProject
-                key={project.svn_url + index}
-                url={project.svn_url}
-                name={project.name}
-                starsCount={project.stargazers_count}
-                order={index + 1}
-                isLast={projects.length - 1 === index}
-                setLastInView={handleSetLastInView}
-              />
-            ))
-          }
-          {
-            isLoading && (
-              <li className='progress-bar-container'>
-                <ProgressBar
-                  height="80"
-                  width="80"
-                  ariaLabel="progress-bar-loading"
-                  wrapperStyle={{}}
-                  wrapperClass="progress-bar-wrapper"
-                  borderColor = '#F4442E'
-                  barColor = '#51E5FF'
-                />
-              </li>
-            )
-          }
-        </>
-      </ul>
+      <GitProjectList
+        errorMessage={errorMessage}
+        handleSetLastInView={handleSetLastInView}
+        isLoading={isLoading}
+        projects={projects}
+      />
     </div>
-  )
-}
+  );
+};

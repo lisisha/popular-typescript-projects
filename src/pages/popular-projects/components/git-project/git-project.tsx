@@ -1,43 +1,42 @@
 import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 
-import { TProps } from './git-project-types';
+import { TGitProject, TLastGitProject } from './git-project-types';
 
 import './git-project.scss';
 
-export const LastGitProject = ({
+const LastGitProject = ({
   url,
   name,
   starsCount,
   order,
-  isLast,
   setLastInView,
-}: TProps) => {
+}: TLastGitProject) => {
   const { ref, inView } = useInView({
     threshold: 0,
   });
 
   useEffect(() => {
     setLastInView(inView)
-  }, [inView, setLastInView])
+  }, [inView, setLastInView]);
 
   return (
     <li
       ref={ref}
-      className='git-project last'
+      className='git-project'
     >
-      <div>
+      <span className='git-project-num'>
         {order}
-      </div>
+      </span>
       <a
         className='git-link'
         href={url}
         target='_blank'
-        rel="noreferrer">
+        rel='noreferrer'>
           {name}
       </a>
       <div className='stars-count'>
-        stars: {starsCount}
+        &#9733; {starsCount}
       </div>
     </li>
   )
@@ -51,17 +50,16 @@ export const GitProject = (
     order,
     isLast,
     setLastInView,
-  }: TProps
+  }: TGitProject
 ) => {
   if (isLast) {
     return (
       <LastGitProject
-        url={url}
         name={name}
-        starsCount={starsCount}
         order={order}
-        isLast={isLast}
         setLastInView={setLastInView}
+        starsCount={starsCount}
+        url={url}
       />
     )
   }
@@ -70,19 +68,19 @@ export const GitProject = (
     <li
       className='git-project'
     >
-      <div>
+      <span className='git-project-num'>
         {order}
-      </div>
+      </span>
       <a
         className='git-link'
         href={url}
         target='_blank'
-        rel="noreferrer">
+        rel='noreferrer'>
           {name}
       </a>
       <div className='stars-count'>
-        stars: {starsCount}
+        &#9733; {starsCount}
       </div>
     </li>
   );
-}
+};

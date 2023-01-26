@@ -1,5 +1,5 @@
-export type ProjectType = {
+export type APIProjectType = {
   name: string;
-  svn_url: string;
   stargazers_count: number;
+  svn_url: string;
 };
