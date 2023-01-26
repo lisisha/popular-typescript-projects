@@ -1,9 +1,17 @@
 .git-project {
+  box-sizing: border-box;
   display: flex;
+  justify-content: space-between;
   width: 100%;
   padding: 15px;
 }
 
 .git-link {
   display: block;
+  text-decoration: none;
+  color: #383837;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
