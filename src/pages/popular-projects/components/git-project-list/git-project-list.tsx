@@ -30,7 +30,7 @@ export const GitProjectList = ({
             ))
           }
           {
-            isLoading && (
+            !errorMessage && isLoading && (
               <li className='progress-bar-container'>
                 <ProgressBar
                   ariaLabel='progress-bar-loading'
@@ -46,7 +46,7 @@ export const GitProjectList = ({
           }
           {
             errorMessage && (
-              <li>{errorMessage}</li>
+              <li className="error">{errorMessage}</li>
             )
           }
         </>
