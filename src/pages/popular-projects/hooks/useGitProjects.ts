@@ -1,48 +1,48 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 
+import { GIT_API_URL, GIT_SORT, PER_PAGE, SEARCH_LANGUAGE } from '../popular-projects-constants';
 import { APIProjectType } from '../popular-projects-types';
-import { PER_PAGE, SEARCH_LANGUAGE } from '../popular-projects-constants';
 
 export const useGetProjects = () => {
   const [projects, setProjects] = useState<APIProjectType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const pageRef = useRef<number>(0);
+  const pageRef = useRef(0);
 
   const getProjects = useCallback(async () => {
     setIsLoading(true);
-    pageRef.current = pageRef.current + 1;
+    
+    if (errorMessage) {
+      setErrorMessage('');
+    } else {
+      pageRef.current = pageRef.current + 1;
+    }
 
     await axios.get(
-      'https://api.github.com/search/repositories',
+      GIT_API_URL,
       {
         params: {
           q: `language:${SEARCH_LANGUAGE}`,
-          sort: 'stars',
+          sort: GIT_SORT,
           page: pageRef.current,
           per_page: PER_PAGE,
         }
       }
     ).then(
       ({data}: any) => {
-        setProjects(
-          [
-            ...projects,
-            ...data.items,
-          ]
-        );
-        setIsLoading(false);
+        setProjects([...projects, ...data.items]);
       },
-      (error: any) => {
+      (error: Error) => {
         setErrorMessage(error.message);
       }
-    );
-  }, [projects]);
+    ).finally(() => setIsLoading(false));
+  }, [projects, errorMessage]);
 
   useEffect(() => {
-    getProjects()
+    getProjects();
+    // eslint-disable-next-line
   }, []);
   
-  return { projects, getProjects, errorMessage, isLoading };
+  return {projects, errorMessage, isLoading, getProjects};
 };
